@@ -1,4 +1,4 @@
-
+ 
 #include <Wire.h>
 #include <SPI.h>
 
@@ -6,14 +6,16 @@
 
 int rc_interval=200;
 int telemetry_interval=500;
+int escmax=2000;
+int escmin=750;
 
 byte ID=1;
 
-double kp_stab_yaw=0.3; double kp_stab_pitch=0.3; double kp_stab_roll=0.3; 
-double kp_motor_yaw=0.2; double kp_motor_pitch=0.02; double kp_motor_roll=0.2;
+double kp_stab_yaw=0; double kp_stab_pitch=1.8; double kp_stab_roll=1.8; 
+double kp_motor_yaw=0; double kp_motor_pitch=1.8; double kp_motor_roll=1.8;
 
 double ki_stab_yaw=0; double ki_stab_pitch=0; double ki_stab_roll=0;
-double ki_motor_yaw=0; double ki_motor_pitch=0; double ki_motor_roll=0;
+double ki_motor_yaw=0; double ki_motor_pitch=0  ; double ki_motor_roll=0;
 
 double kd_stab_yaw=0; double kd_stab_pitch=0; double kd_stab_roll=0; 
 double kd_motor_yaw=0; double kd_motor_pitch=0; double kd_motor_roll=0;
@@ -32,6 +34,10 @@ int ch_yaw=0;
 int ch_pitch=0;
 int ch_roll=0;
 
+int fl_output;
+int bl_output;
+int fr_output;
+int br_output;
 
 ////////////////////////////////////////////////////////////////////////
 double desired_thr=0;

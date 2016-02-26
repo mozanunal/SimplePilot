@@ -10,7 +10,9 @@ If you don't need telemetry you can uncomment NoTelemetry
 #include <RF24.h>
 #include "nRF24L01.h"
 
-RF24 radio(7,8);
+RF24 radio(8,10);
+
+
 
 void Telemetry_Start()
 { 
@@ -77,7 +79,10 @@ void Rc_Update()
     desired_pitch=ch_pitch;
     desired_roll=ch_roll;
   }
-  
+    
+  Serial.print(fl_output);  Serial.print("      "); Serial.println(fr_output);
+  Serial.print(bl_output);  Serial.print("      "); Serial.println(br_output);
+ 
   Serial.print("RC=");
   Serial.print(ch_thr);
   Serial.print(",");
@@ -88,3 +93,4 @@ void Rc_Update()
   Serial.print(ch_roll);
   Serial.println();
 }
+

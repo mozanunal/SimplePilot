@@ -14,6 +14,8 @@ The Imu, which is chosen, must have 2 fuction(Imu_Start and Imu_Update)
 #include "CommunicationUtils.h"
 #include "FreeIMU.h"
 
+bool firstloop=1;
+double firstyaw=0;
 int raw_values[9];
 float ypr[3]; 
 float val[9];
@@ -29,7 +31,12 @@ void Imu_Start()
 void Imu_Update()
 {
   my3IMU.getYawPitchRoll(ypr);
-  real_yaw=ypr[0];
+  if(firstloop==1)
+  {
+   firstyaw=real_yaw; 
+   firstloop=0;
+  }
+  real_yaw=ypr[0]-firstyaw;
   real_pitch=ypr[1];
   real_roll=ypr[2];
   
@@ -40,4 +47,5 @@ void Imu_Update()
 
 }
 //////////////////////////////
+
 

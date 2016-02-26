@@ -22,6 +22,11 @@ void Motor_Arm()
  MOTOR3.attach(MOTORpin3);
  MOTOR4.attach(MOTORpin4);
  
+ MOTOR1.writeMicroseconds(750);
+ MOTOR2.writeMicroseconds(750);
+ MOTOR3.writeMicroseconds(750);
+ MOTOR4.writeMicroseconds(750);
+ 
 }
 
 
@@ -48,11 +53,12 @@ void Motor_Update(int mode)
   double error_yaw = desired_yaw-real_yaw;
   double error_pitch= desired_pitch-real_pitch;
   double error_roll=desired_roll-real_roll;
-  
+       if (desired_thr>100)//when throttle is bigger than 100//
+       { 
   total_error_yaw += error_yaw*loop_timer; 
   total_error_pitch += error_pitch*loop_timer;
   total_error_roll += error_roll*loop_timer;
-
+       }
   double error_change_yaw = (error_yaw- old_error_yaw)/loop_timer;
   double error_change_pitch = (error_pitch- old_error_pitch)/loop_timer;
   double error_change_roll = (error_roll- old_error_roll)/loop_timer;
@@ -67,11 +73,12 @@ void Motor_Update(int mode)
   double error_yaw_angvel = desired_yaw_angvel - real_yaw_angvel;
   double error_pitch_angvel = desired_pitch_angvel - real_pitch_angvel;
   double error_roll_angvel =desired_roll_angvel - real_roll_angvel;
-
+        if (desired_thr>100)//when throttle is bigger than 100//
+       { 
   total_error_yaw_angvel += error_yaw_angvel*loop_timer; 
   total_error_pitch_angvel += error_pitch_angvel*loop_timer;
   total_error_roll_angvel += error_roll_angvel*loop_timer;
-
+       }
   double error_change_yaw_angvel = (error_yaw_angvel- old_error_yaw_angvel)/loop_timer;
   double error_change_pitch_angvel = (error_pitch_angvel- old_error_pitch_angvel)/loop_timer;
   double error_change_roll_angvel = (error_roll_angvel- old_error_roll_angvel)/loop_timer;
@@ -79,24 +86,38 @@ void Motor_Update(int mode)
   double output_motor_yaw=calculate_pid(kp_motor_yaw, ki_motor_yaw, kd_motor_yaw, error_yaw_angvel, total_error_yaw_angvel, error_change_yaw_angvel);
   double output_motor_pitch=calculate_pid(kp_motor_pitch, ki_motor_pitch, kd_motor_pitch, error_pitch_angvel, total_error_pitch_angvel, error_change_pitch_angvel);
   double output_motor_roll=calculate_pid(kp_motor_roll, ki_motor_roll, kd_motor_roll, error_roll_angvel, total_error_roll_angvel, error_change_roll_angvel);
-  /*
-  Serial.println(output_motor_yaw);
-  Serial.println(output_motor_pitch);
-  Serial.println(output_motor_roll);
-  */
+ // Serial.print(output_motor_yaw); Serial.print("\t"); Serial.print(output_motor_pitch); Serial.print("\t");Serial.println(output_motor_roll);
 ////////////////////////////////Write Outputs to Motors/////////////////////////////////
-  int fl_output= (real_thr - output_motor_roll - output_motor_pitch - output_motor_yaw);
-  int bl_output=(real_thr - output_motor_roll + output_motor_pitch + output_motor_yaw);
-  int fr_output=(real_thr + output_motor_roll - output_motor_pitch + output_motor_yaw);
-  int br_output=(real_thr + output_motor_roll + output_motor_pitch - output_motor_yaw);
-      if (real_thr>10)//when throttle is bigger than 10//
+      if (desired_thr>100)//when throttle is bigger than 100//
        { 
-        MOTOR1.write(fl_output);
-        MOTOR2.write(fr_output);
-        MOTOR3.write(bl_output);
-        MOTOR4.write(br_output);
-       }
+        fl_output= (desired_thr - output_motor_roll - output_motor_pitch- output_motor_yaw);
+        bl_output=(desired_thr - output_motor_roll + output_motor_pitch+ output_motor_yaw);
+        fr_output=(desired_thr + output_motor_roll - output_motor_pitch+ output_motor_yaw);
+        br_output=(desired_thr + output_motor_roll + output_motor_pitch- output_motor_yaw);
 
+        fl_output= setlimit(fl_output,1000,0);
+        bl_output= setlimit(bl_output,1000,0);
+        fr_output=setlimit(fr_output,1000,0);
+        br_output=setlimit(br_output,1000,0);
+
+        
+         
+        MOTOR1.writeMicroseconds(map(fl_output, 0, 1023, 700, 2000));
+        MOTOR2.writeMicroseconds(map(fr_output, 0, 1023, 700, 2000));
+        MOTOR3.writeMicroseconds(map(bl_output, 0, 1023, 700, 2000));
+        MOTOR4.writeMicroseconds(map(br_output, 0, 1023, 700, 2000));
+       }
+       else
+       {
+        fl_output=0;
+        bl_output=0;
+        fr_output=0;
+        br_output=0;
+        MOTOR1.writeMicroseconds(750);
+        MOTOR2.writeMicroseconds(750);
+        MOTOR3.writeMicroseconds(750);
+        MOTOR4.writeMicroseconds(750);
+       }
   /////////////For next loop- ypr//////////////////     
   old_real_yaw=real_yaw;
   old_real_pitch=real_pitch;
@@ -138,4 +159,5 @@ double setlimit(double number, double maxlimit, double minlimit)
   return number;
  }
 }
+
 
